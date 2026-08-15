@@ -17,7 +17,6 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/ferasshita/Shita-Multivendor-Food-Delivery)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/graphs/contributors)
 [![Open Pull Requests](https://img.shields.io/github/issues-pr-raw/ferasshita/Shita-Multivendor-Food-Delivery.svg)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/pulls)
 [![Activity](https://img.shields.io/github/last-commit/ferasshita/Shita-Multivendor-Food-Delivery.svg)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/commits/main)
-[![YouTube Channel](https://img.shields.io/badge/Watch_us-Youtube-red)](https://www.youtube.com/@ninjascode509)
 
 </div>
 
