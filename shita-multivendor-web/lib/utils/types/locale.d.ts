@@ -1,0 +1,2 @@
+
+  export type TLocale = "en";

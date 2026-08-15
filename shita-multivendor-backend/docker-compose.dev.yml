@@ -1,0 +1,35 @@
+# Docker Compose for Development
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:6
+    container_name: shita-mongodb-dev
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: shita-multivendor
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_data_dev:/data/db
+    networks:
+      - shita-network-dev
+
+  redis:
+    image: redis:7-alpine
+    container_name: shita-redis-dev
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - shita-network-dev
+
+volumes:
+  mongodb_data_dev:
+    driver: local
+
+networks:
+  shita-network-dev:
+    driver: bridge

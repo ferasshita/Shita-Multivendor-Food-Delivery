@@ -1,0 +1,235 @@
+import { useState, useContext, useRef, useEffect } from 'react'
+import { Alert } from 'react-native'
+import _ from 'lodash' // Import lodash
+import * as Device from 'expo-device'
+import Constants from 'expo-constants'
+import { useMutation } from '@apollo/client'
+import gql from 'graphql-tag'
+import { login, emailExist } from '../../apollo/mutations'
+import ThemeContext from '../../ui/ThemeContext/ThemeContext'
+import { theme } from '../../utils/themeColors'
+import * as Notifications from 'expo-notifications'
+import { FlashMessage } from '../../ui/FlashMessage/FlashMessage'
+import analytics from '../../utils/analytics'
+import AuthContext from '../../context/Auth'
+import { useNavigation } from '@react-navigation/native'
+import { useTranslation } from 'react-i18next'
+
+const LOGIN = gql`
+  ${login}
+`
+const EMAIL = gql`
+  ${emailExist}
+`
+
+export const useLogin = () => {
+  const { t, i18n } = useTranslation()
+  const Analytics = analytics()
+
+  const navigation = useNavigation()
+  const [email, setEmail] = useState('')
+  const emailRef = useRef('')
+  const [password, setPassword] = useState('')
+  const [showPassword, setShowPassword] = useState(true)
+  const [emailError, setEmailError] = useState(null)
+  const [passwordError, setPasswordError] = useState(null)
+  const [registeredEmail, setRegisteredEmail] = useState(false)
+  const themeContext = useContext(ThemeContext)
+  const currentTheme = { isRTL: i18n.dir() === 'rtl', ...theme[themeContext.ThemeValue] }
+  const { setTokenAsync } = useContext(AuthContext)
+
+  const [EmailEixst, { loading }] = useMutation(EMAIL, {
+    onCompleted,
+    onError
+  })
+
+  const [LoginMutation, { loading: loginLoading }] = useMutation(LOGIN, {
+    onCompleted: onLoginCompleted,
+    onError: onLoginError
+  })
+
+  // Update both state and ref
+  const handleSetEmail = (newEmail) => {
+    setEmail(newEmail)
+    emailRef.current = newEmail
+    if (emailError) {
+      setEmailError(null)
+    }
+  }
+
+  // Reset password when registeredEmail becomes true
+  useEffect(() => {
+    if (registeredEmail) {
+      if (emailRef.current === 'demo-customer@shita.com') {
+        setPassword('123123')
+      } else {
+        setPassword('')
+      }
+    }
+  }, [registeredEmail])
+  function validateCredentials() {
+    let result = true
+    setEmailError(null)
+    setPasswordError(null)
+
+    // Use the state value for validation
+    if (!email.trim()) {
+      setEmailError(t('emailErr1'))
+      result = false
+    } else {
+      const emailRegex = /^\w+([\\.-]?\w+)*@\w+([\\.-]?\w+)*(\.\w{2,3})+$/
+      if (emailRegex.test(email) !== true) {
+        setEmailError(t('emailErr2'))
+        result = false
+      }
+    }
+    if (!password && registeredEmail) {
+      setPasswordError(t('passErr1'))
+      result = false
+    }
+    return result
+  }
+
+  function onCompleted({ emailExist }) {
+    if (validateCredentials()) {
+      if (emailExist && emailExist._id) {
+        if (
+          emailExist.userType !== 'apple' &&
+          emailExist.userType !== 'google' &&
+          emailExist.userType !== 'facebook'
+        ) {
+          setRegisteredEmail(true)
+        } else {
+          FlashMessage({
+            message: `${t('emailAssociatedWith')} ${emailExist.userType} ${t(
+              'continueWith'
+            )} ${emailExist.userType}`
+          })
+          navigation.navigate({ name: 'Main', merge: true })
+        }
+      } else {
+        navigation.navigate('Register', { email:emailRef.current })
+      }
+    }
+  }
+
+  function onError(error) {
+    try {
+      FlashMessage({
+        message: error.graphQLErrors[0].message
+      })
+    } catch (e) {
+      FlashMessage({
+        message: t('mailCheckingError')
+      })
+    }
+  }
+
+  async function onLoginCompleted(data) {
+    if (data.login.isActive == false) {
+      FlashMessage({ message: t('accountDeactivated') })
+    } else {
+      try {
+        await Analytics.identify(
+          {
+            userId: data.login.userId
+          },
+          data.login.userId
+        )
+        await Analytics.track(Analytics.events.USER_LOGGED_IN, {
+          userId: data.login.userId,
+          name: data.login.name,
+          email: data.login.email
+        })
+        setTokenAsync(data.login.token)
+        navigation.navigate({
+          name: 'Main',
+          merge: true
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }
+
+  function onLoginError(error) {
+    try {
+      FlashMessage({
+        message: error.graphQLErrors[0].message
+      })
+    } catch (e) {
+      FlashMessage({ message: t('errorInLoginError') })
+    }
+  }
+
+  async function loginAction(email, password) {
+    try {
+      if (validateCredentials()) {
+        let notificationToken = null
+          try {
+            if (Device.isDevice) {
+              const {
+                status: existingStatus
+              } = await Notifications.getPermissionsAsync()
+              if (existingStatus === 'granted') {
+                notificationToken = (await Notifications.getExpoPushTokenAsync({
+                  projectId: Constants.expoConfig.extra.eas.projectId
+                })).data
+              }
+            }
+        } catch (error) {
+          FlashMessage({
+            message: t('errorWhileGettingNotificationToken'),
+          })
+        }
+        LoginMutation({
+          variables: {
+            email,
+            password,
+            type: 'default',
+            notificationToken
+          }
+        })
+      }
+    } catch (e) {
+      FlashMessage({
+        message: t('errorWhileLogging')
+      })
+    } finally {
+    }
+  }
+
+  function checkEmailExist() {
+    if (validateCredentials()) {
+      EmailEixst({ variables: { email: emailRef.current } })
+    }
+  }
+
+  function onBackButtonPressAndroid() {
+    navigation.navigate({
+      name: 'Main',
+      merge: true
+    })
+    return true
+  }
+
+  return {
+    setEmail,
+    password,
+    setPassword,
+    showPassword,
+    setShowPassword,
+    emailError,
+    passwordError,
+    registeredEmail,
+    currentTheme,
+    loading,
+    loginLoading,
+    loginAction,
+    checkEmailExist,
+    onBackButtonPressAndroid,
+    emailRef,
+    themeContext,
+    handleSetEmail
+  }
+}
