@@ -22,14 +22,6 @@
 </div>
 
 
-<div align="center">
-
-  <a href="https://www.youtube.com/watch?v=00voqzkFpHU">
-    <img src="./assets/Multi Service Solution.webp" alt="Demo video" style="border-radius: 6px; width: auto;">
-  </a>
-
-</div>
-
 <br>
 
 The Shita Multi Vendor Delivery Management System is designed for businesses looking to deploy a complete, ready-to-use platform for running their online ordering and delivery operations. Whether it is food or grocery delivery, parcel logistics, home services, flowers, pharmacy orders, or other delivery-based businesses, Shita can be adapted to your needs.
