@@ -1,0 +1,67 @@
+# ------------------------------------------------------------------------------
+# REQUIRED: AWS Region & Project Settings
+# ------------------------------------------------------------------------------
+aws_region   = "us-east-1"
+project_name = "shita-food-delivery"
+environment  = "dev"  # Options: dev, staging, prod
+
+# ------------------------------------------------------------------------------
+# VPC NETWORKING
+# ------------------------------------------------------------------------------
+# IMPORTANT: Ensure these CIDRs do NOT overlap with your existing networks.
+vpc_cidr = "10.0.0.0/16"
+
+# One private subnet per Availability Zone (we recommend at least 2 AZs for HA)
+private_subnet_cidrs = ["10.0.1.0/24", "10.0.2.0/24"]
+public_subnet_cidrs  = ["10.0.101.0/24", "10.0.102.0/24"]
+
+# Set to 'false' for production to have a NAT Gateway in each AZ (higher cost, better HA)
+single_nat_gateway = true
+
+# ------------------------------------------------------------------------------
+# ECS (FARGATE) COMPUTE
+# ------------------------------------------------------------------------------
+# Default CPU/Memory for each microservice (Order, Dispatch, Notification)
+ecs_task_cpu    = "256"   # 256 = 0.25 vCPU
+ecs_task_memory = "512"   # 512 MB
+
+# Default number of running tasks per service
+desired_count = 2
+
+# Docker image tags. 
+# These will be appended to the ECR repository URL (e.g., <repo_url>:latest)
+# After you build your images, update these tags to trigger new deployments.
+order_image_tag        = "latest"
+dispatch_image_tag     = "latest"
+notification_image_tag = "latest"
+
+# ------------------------------------------------------------------------------
+# RDS POSTGRESQL (with PostGIS)
+# ------------------------------------------------------------------------------
+rds_engine_version       = "15.4"
+rds_instance_class       = "db.t3.medium"   # Primary DB
+rds_replica_instance_class = "db.t3.medium" # Read Replica (same class or smaller)
+rds_allocated_storage    = 20               # GB
+rds_db_name              = "food_delivery"
+rds_db_username          = "app_user"
+
+# Multi-AZ for the primary database (highly recommended for production)
+rds_multi_az = true
+
+# Backup retention in days (7 is a good default)
+rds_backup_retention = 7
+
+# ------------------------------------------------------------------------------
+# ELASTICACHE REDIS (Geospatial & Sessions)
+# ------------------------------------------------------------------------------
+redis_engine_version = "6.x"
+redis_node_type      = "cache.t3.micro" # For dev; use larger types in prod
+
+# ------------------------------------------------------------------------------
+# S3 & LOGGING
+# ------------------------------------------------------------------------------
+# WARNING: Set to 'true' ONLY for dev environments to allow bucket deletion via Terraform.
+force_destroy_bucket = false
+
+# How many days to keep CloudWatch logs before they expire
+log_retention_days = 30

@@ -1,0 +1,20 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.log
+crash.log
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Sensitive
+**/.env
+**/.terraform.tfstate.lock.info
+
+# IDE
+.idea/
+.vscode/
+*.swp
