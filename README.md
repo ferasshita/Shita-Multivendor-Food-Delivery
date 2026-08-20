@@ -17,8 +17,10 @@
 [![GitHub contributors](https://img.shields.io/github/contributors/ferasshita/Shita-Multivendor-Food-Delivery)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/graphs/contributors)
 [![Open Pull Requests](https://img.shields.io/github/issues-pr-raw/ferasshita/Shita-Multivendor-Food-Delivery.svg)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/pulls)
 [![Activity](https://img.shields.io/github/last-commit/ferasshita/Shita-Multivendor-Food-Delivery.svg)](https://github.com/ferasshita/Shita-Multivendor-Food-Delivery/commits/main)
-
+<br />
+<a href="https://www.producthunt.com/products/shita-multi-vendor-delivery-platform?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-shita-multi-vendor-delivery-platform" target="_blank" rel="noopener noreferrer"><img alt="Shita Multi Vendor Delivery Platform - opensource, ecommerce, logistics | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1227200&amp;theme=light&amp;t=1787185800246"></a>
 </div>
+
 
 
 <br>
